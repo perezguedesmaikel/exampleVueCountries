@@ -1,11 +1,11 @@
 <script setup lang="ts">
 import ApiService from '../services/ApiServices.ts'
 import { reactive, onMounted } from "vue";
+import CountryList from "./CountryList.vue";
+import {IData} from "./interfaces.ts";
 
 const service = new ApiService('https://restcountries.com/v3.1/')
-interface IData{
-  name:{common:string}
-}
+
 const data:IData[] = reactive([])
 
 
@@ -28,7 +28,9 @@ onMounted(fetchData)
 <div class="text-center py-24">
   <h1 class="text-4xl font-bold tracking-widest text-sky-700"> Countries App</h1>
   <h6 class="mt-4 text-xl"> A simple app to search countries</h6>
-  <div v-for="el in data" key="el.name.common">{{el.name.common}}</div>
+  <div class="container max-w-screen-lg mx-auto">
+  <CountryList v-for="el in data" :key="el.name.common" :countries="el"/>
+  </div>
 </div>
 </template>
 
