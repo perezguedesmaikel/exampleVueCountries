@@ -9,8 +9,8 @@ export default class ApiService {
 
     async getCountries(endPoint: string) {
         try {
-            const response = await axios.get(`${this.baseUrl}${endPoint}`);
-            return response.data;
+            const {data} = await axios.get(`${this.baseUrl}${endPoint}`);
+            return data;
         } catch (error) {
             console.error("Error fetching countries:", error);
             throw error;
