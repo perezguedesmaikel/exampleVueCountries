@@ -29,7 +29,7 @@ onMounted(fetchData)
   <h1 class="text-4xl font-bold tracking-widest text-sky-700"> Countries App</h1>
   <h6 class="mt-4 text-xl"> A simple app to search countries</h6>
   <div class="container max-w-screen-lg mx-auto">
-  <CountryList v-for="el in data" :key="el.name.common" :countries="el"/>
+  <CountryList :data="data"/>
   </div>
 </div>
 </template>
