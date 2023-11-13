@@ -17,7 +17,6 @@ const fetchData = async () => {
   try {
     const countries: [] = await service.getCountries('all')
     data.push(...countries)
-    totalItems.value = data.length
   } catch (error) {
     console.error('Error fetching countries:', error)
     throw error
@@ -44,6 +43,7 @@ onMounted(() => {
 
 })
 watch([data, page, filteredCountries], () => {
+  totalItems.value = filteredCountries.value.length > 0 ? filteredCountries.value.length : data.length
   sliceCountries(filteredCountries.value.length > 0 || search.value !== '' ? filteredCountries.value : data)
 })
 </script>
@@ -64,6 +64,7 @@ watch([data, page, filteredCountries], () => {
             @input="filterCountries"/>
       </div>
       <CountryList :country="paginatedCountries"/>
+      <div><label>{{ page }}</label></div>
       <div class="mt-8 space-x-1">
         <button :class="{'opacity-50':page<=1}" :disabled="page<=1"
                 class=" border border-gray-300 rounded px-2 py-0.5 hover:bg-gray-200 w-[100px]"
