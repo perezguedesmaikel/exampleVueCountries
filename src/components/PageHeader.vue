@@ -1,19 +1,23 @@
 <script lang="ts" setup>
 import ApiService from '../services/ApiServices.ts'
-import {reactive, onMounted, ref, Ref} from "vue";
+import {reactive, onMounted, ref, Ref, watch} from "vue";
 import CountryList from "./CountryList.vue";
 import {IData} from "./interfaces.ts";
 
 const service = new ApiService('https://restcountries.com/v3.1/')
 
 let data: IData[] = reactive([])
-
-const search = ref(null)
+const search = ref('')
 let filteredCountries: Ref<IData[]> = ref([]);
+const page = ref(1)
+const itemPerPage = ref(12)
+const paginatedCountries: Ref<IData[]> = ref([])
+const totalItems = ref(0)
 const fetchData = async () => {
   try {
     const countries: [] = await service.getCountries('all')
     data.push(...countries)
+    totalItems.value = data.length
   } catch (error) {
     console.error('Error fetching countries:', error)
     throw error
@@ -25,7 +29,23 @@ function filterCountries() {
   console.log('searching Countries', search.value)
 }
 
-onMounted(fetchData)
+function sliceCountries(currentArrayCountries: IData[]) {
+  const start = (page.value - 1) * itemPerPage.value
+  const end = page.value * itemPerPage.value
+  paginatedCountries.value = currentArrayCountries.slice(start, end)
+}
+
+function changePage(pageNew: number) {
+  page.value = pageNew
+}
+
+onMounted(() => {
+  fetchData()
+
+})
+watch([data, page, filteredCountries], () => {
+  sliceCountries(filteredCountries.value.length > 0 || search.value !== '' ? filteredCountries.value : data)
+})
 </script>
 
 <template>
@@ -43,7 +63,17 @@ onMounted(fetchData)
             type="text"
             @input="filterCountries"/>
       </div>
-      <CountryList :country="filteredCountries.length>0?filteredCountries:data"/>
+      <CountryList :country="paginatedCountries"/>
+      <div class="mt-8 space-x-1">
+        <button :class="{'opacity-50':page<=1}" :disabled="page<=1"
+                class=" border border-gray-300 rounded px-2 py-0.5 hover:bg-gray-200 w-[100px]"
+                @click="()=>changePage(page-1)">Previous
+        </button>
+        <button :class="{'opacity-50':page>=totalItems/itemPerPage}" :disabled="page>=totalItems/itemPerPage"
+                class="border border-gray-300 rounded px-2 py-0.5 hover:bg-gray-200 w-[100px]"
+                @click="()=>changePage(page+1)">Next
+        </button>
+      </div>
     </div>
   </div>
 </template>
